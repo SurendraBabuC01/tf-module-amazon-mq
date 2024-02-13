@@ -31,7 +31,7 @@ resource "aws_security_group" "main" {
   }
 }
 
-resource "aws_instance" "web" {
+resource "aws_instance" "main" {
   ami                    = data.aws_ami.ami.id
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.main.id]
@@ -49,5 +49,12 @@ resource "aws_instance" "web" {
   tags = merge(var.tags, { Name = "${var.name}-${var.env}-rabbitmq" })
 }
 
+resource "aws_route53_record" "main" {
+  zone_id = var.domain_id
+  name    = "rabbitmq-${var.env}"
+  type    = "A"
+  ttl     = 30
+  records = [aws_instance.main.private_ip]
+}
 
 
